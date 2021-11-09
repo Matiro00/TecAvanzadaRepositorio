@@ -1,26 +1,152 @@
+*{
+    box-sizing: border-box
+}
 html,body{
-    background-color:grey;
+    background-color:#808080;
+    background-image: url('../images/wave.svg') ;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100%;
+    
 }
 #chat{
     padding-top: 10px;
     height: 600px;
-    max-width: 200 px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
-.container-chat{
-    background-color: yellowgreen;
-    padding-top: 10px;
+.user-on-list{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+    
+    
+}
+.list-container{
+    height: 580px;
+    overflow-y: auto;
+    direction: rtl;
+    
+
+    border-width: 3px;
+    
+  border-style: solid;
+  border-image: 
+    linear-gradient(
+      to bottom, 
+      yellowgreen, 
+      rgba(0, 0, 0, 0)
+    ) 1 100%;
+}
+  
+  .list-container::-webkit-scrollbar {
+    position: absolute;
+    
+    width: 12px;
+  }
+  
+  .list-container::-webkit-scrollbar-thumb {
     border-radius: 10px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #737272;
+  }
+ #chat::-webkit-scrollbar-track {
+    border: 1px solid #000;
+    padding: 2px 0;
+    background-color: #404040;
+    border-radius: 10px;
+  }
+  
+  #chat::-webkit-scrollbar {
+    width: 12px;
+  }
+  
+  #chat::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #737272;
+    border: 1px solid #000;
+  }
+.bold{
+    font-weight: bold;
+}
+.padding-bottom{
     padding-bottom: 10px;
 }
+.contenido{
+    margin-bottom: 20px;
+}
+.btn-custom{
+    width: inherit;
+    color: white;
+    background-color: rgb(27, 27, 27);
+    display:contents;
+}
+.btn-custom svg {
+    width: 35px;
+    height: 35px;
+}
+.container-form{
+    margin-top: 20px;
+}
+.container-salas{
+    color: white;
+    background-color: rgb(49, 49, 49);
+    border-radius: 10px;
+    padding-bottom: 10px;
+    margin-top: 10px;
+}
+.titulo-list{
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 50px;
+    font-style: italic;
+    border-bottom: 2px solid;
+    
+}
+.titulo{
+    text-align: center;
+}
+.chat-side{
+    width: 900px;
+}
+.container-chat{
+    color: white;
+    background-color: rgb(49, 49, 49);
+    border-radius: 10px;
+    padding-bottom: 10px;
+    margin-top: 10px;
+    
+}
+.container-mensajes{
+    background-color: rgb(83, 83, 83);
+    border-radius: 10px;
+    
+}
+
 .chat-input{
     border-radius: 10px;
+    margin-top: 20px;
     padding-top: 10px;
     padding-left: 10px;
     padding-bottom: 10px;
     background-color: green;
 }
+.nav-item{
+    padding-right: 20px;
+}
+.show li {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.usuario{
+    padding-left: 40px;
+
+}
 .boton-enviar{
+    width: -webkit-fill-available;
     background-color: rgb(2, 90, 2);
     color: white;
 
@@ -28,4 +154,57 @@ html,body{
 .boton-enviar:hover{
     background-color: rgb(1, 59, 1);
     color: white;
+}
+.mensaje{
+    margin-top: 20px;
+    margin-left: 20px;
+    padding-left: 20px;
+    width: 400px;
+    background-color: rgb(117, 156, 40);
+    border-radius: 20px;
+}
+
+.form-container{
+    width: 65%;
+    align-items: center;
+    
+}
+.card-body{
+    background-color: #404040;
+    border: 2px solid yellowgreen;
+    color: white;
+}
+.titulo-salas{
+    text-align: center;
+    font-size: 60px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    margin-bottom: 40px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid white;
+}
+.label-dark{
+    color: #000;
+}
+.room-card{
+    border: 5px solid rgb(44, 44, 43);
+    background-color: rgb(27, 27, 27);
+    border-radius: 20px;
+    align-items: center;
+    text-align: left;
+    margin-bottom: 20px;
+}
+.room-name{
+    text-align: left;
+    padding-left: 30px;
+    font-size: 30px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+    padding-top: 10px;
+}
+.usuario{
+    color:white;
+}
+.navbar-custom{
+    border-bottom:5px solid rgb(20, 20, 20);
 }
