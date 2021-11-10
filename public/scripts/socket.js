@@ -1,4 +1,5 @@
 const chatInput = document.getElementById('chat-input');
+const saveMsgButton=document.getElementById('leave-saving');
 const chatScroll = document.querySelector('.container-mensajes');
 const salaNombre= document.getElementById('sala-nombre');
 const usuarioLista= document.getElementById('usuarios-lista');
@@ -24,7 +25,10 @@ socket.on('mensaje', mensaje => {
     
 })
 
-
+function leaveSaving(){
+    console.log('dadasd')
+    socket.emit('disconnectSaving')
+};
 chatInput.addEventListener('submit', e => {
     e.preventDefault();
 
@@ -54,3 +58,4 @@ function mostrarUsuarios(users){
     ${users.map(usuario=>`<li class="user-on-list">${usuario.nombre}</li>`).join()}
     `;
 }
+
