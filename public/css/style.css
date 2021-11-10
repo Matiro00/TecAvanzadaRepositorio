@@ -3,11 +3,13 @@
 }
 html,body{
     background-color:#808080;
+    height: 100%;
+}
+.background{
     background-image: url('../images/wave.svg') ;
     background-repeat: no-repeat;
     background-size: cover;
     height: 100%;
-    
 }
 #chat{
     padding-top: 10px;
@@ -68,6 +70,25 @@ html,body{
     background-color: #737272;
     border: 1px solid #000;
   }
+  .container-salas::-webkit-scrollbar-track {
+    border: 1px solid #000;
+    padding: 2px 0;
+    background-color: #404040;
+    border-radius: 10px;
+  }
+  
+  .container-salas::-webkit-scrollbar {
+    width: 12px;
+  }
+  
+  .container-salas::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #737272;
+    border: 1px solid #000;
+  }
+  
+
 .bold{
     font-weight: bold;
 }
@@ -87,15 +108,34 @@ html,body{
     width: 35px;
     height: 35px;
 }
+.btn-custom svg:hover {
+    color: yellowgreen;
+}
 .container-form{
     margin-top: 20px;
 }
 .container-salas{
     color: white;
     background-color: rgb(49, 49, 49);
+    border-right: 7px solid #000;
+    border-bottom: 7px solid #000;
     border-radius: 10px;
     padding-bottom: 10px;
     margin-top: 10px;
+    overflow-y: auto;
+    height: 880px;
+}
+
+.center{
+    text-align: center;
+}
+.btn-new-room svg{
+    height: 20px;
+    width: 20px;
+}
+.btn-new-room{
+    width: 100px;
+    border-radius: 35px;
 }
 .titulo-list{
     text-align: center;
@@ -105,7 +145,8 @@ html,body{
     border-bottom: 2px solid;
     
 }
-.titulo{
+.swal2-html-container{
+    color: red !important;
     text-align: center;
 }
 .chat-side{
@@ -124,14 +165,28 @@ html,body{
     border-radius: 10px;
     
 }
-
-.chat-input{
-    border-radius: 10px;
-    margin-top: 20px;
-    padding-top: 10px;
-    padding-left: 10px;
-    padding-bottom: 10px;
-    background-color: green;
+.link-log-reg{
+    color: yellowgreen;
+}
+.link-log-reg:hover{
+    color: rgb(113, 151, 38) !important;
+}
+.swal2-confirm{
+    color: #000 !important;
+    background-color: yellowgreen !important;
+}
+.swal2-html-container{
+    color: white !important;
+    font-style: italic !important;
+}
+.swal2-title{
+    color: white !important;
+    font-size: 42px !important;
+}
+.swal2-popup{
+    background-color: #404040 !important;
+    border: 2px solid yellowgreen !important;
+    
 }
 .nav-item{
     padding-right: 20px;
@@ -155,6 +210,23 @@ html,body{
     background-color: rgb(1, 59, 1);
     color: white;
 }
+
+.btn-room-add{
+    width: 55px;
+    height: 55px;
+    border-radius: 35px;
+    padding-top: -1px;
+    font-size: 24px;
+    background-color: yellowgreen;
+    color: white;
+    margin-bottom: 7px;
+}
+.btn-room-add:hover{
+    background-color:rgb(113, 150, 38);
+    color: white;
+}
+
+
 .mensaje{
     margin-top: 20px;
     margin-left: 20px;
