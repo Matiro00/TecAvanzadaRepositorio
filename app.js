@@ -37,8 +37,8 @@ server.listen(PORT, () => {
 
 io.on('connection', socket => {
 
-    socket.on('unirseSala', ({nombre,userid,room,roomid}) => {
-        const usuario = unirseUsuario(socket.id, nombre,userid, room,roomid);
+    socket.on('unirseSala', ({ nombre, userid, room, roomid }) => {
+        const usuario = unirseUsuario(socket.id, nombre, userid, room, roomid);
         socket.join(usuario.room)
         socket.emit('alerta', formatearMensaje('Server:', `Bienvenido ${usuario.nombre}`))
         socket.broadcast.to(usuario.room).emit('alerta', formatearMensaje('Server:', `Chicos entro ${usuario.nombre}, dejen de hablar mal de el`));
@@ -56,26 +56,37 @@ io.on('connection', socket => {
             if (usuario) {
                 if (mensaje_cache.length != 0) {
                     let queryString = "INSERT INTO mensajes ( id_user,emisor, id_room, contenido, tiempo) VALUES";
+                    let queryvalues = "";
                     let primerquery = true;
                     mensaje_cache.forEach(element => {
-                        if (primerquery) {
-                            queryString += "('" + element.user_id + "','" + element.nombre + "','" + element.room_id + "','" + element.texto + "','" + element.tiempo + "')"
-                            primerquery = false;
-                        }
-                        else {
-                            queryString += ",('" + element.user_id + "','" + element.nombre + "','" + element.room_id + "','" + element.texto + "','" + element.tiempo + "')"
+                        if (element.user_id == usuario.userid) {
+                            if (primerquery) {
+                                queryvalues += "('" + element.user_id + "','" + element.nombre + "','" + element.room_id + "','" + element.texto + "','" + element.tiempo + "')"
+                                primerquery = false;
+                            }
+                            else {
+                                queryvalues += ",('" + element.user_id + "','" + element.nombre + "','" + element.room_id + "','" + element.texto + "','" + element.tiempo + "')"
+                            }
                         }
 
                     });
-                    conexion.query(queryString, async (error, result) => {
-                        if (error) {
-                            console.log(error)
-                        }
-                        else {
-                            io.to(usuario.room).emit('alerta', formatearMensaje('Server:', `${usuario.nombre} por suerte ya se fue.`))
-                            io.to(usuario.room).emit('usuariosEnRoom', getRoomUsuarios(usuario.room))
-                        }
-                    })
+                    if (queryvalues.length != 0) {
+                        queryString+=queryvalues;
+                        conexion.query(queryString, async (error, result) => {
+
+                            if (error) {
+                                console.log(error)
+                            }
+                            else {
+                                io.to(usuario.room).emit('alerta', formatearMensaje('Server:', `${usuario.nombre} por suerte ya se fue.`))
+                                io.to(usuario.room).emit('usuariosEnRoom', getRoomUsuarios(usuario.room))
+                            }
+                        })
+                    }
+                    else{
+                        io.to(usuario.room).emit('alerta', formatearMensaje('Server:', `${usuario.nombre} por suerte ya se fue.`))
+                                io.to(usuario.room).emit('usuariosEnRoom', getRoomUsuarios(usuario.room))
+                    }
                 }
                 else {
                     io.to(usuario.room).emit('alerta', formatearMensaje('Server:', `${usuario.nombre} por suerte ya se fue.`))
@@ -87,8 +98,8 @@ io.on('connection', socket => {
 
         socket.on('mensaje', (msg) => {
             if (msg != '') {
-                const usuarioMandar= getUsuariosPorId(socket.id)
-                mensaje=formatearMensajeParaGuardar(usuarioMandar.userid, usuarioMandar.nombre, usuarioMandar.roomid, msg);
+                const usuarioMandar = getUsuariosPorId(socket.id)
+                mensaje = formatearMensajeParaGuardar(usuarioMandar.userid, usuarioMandar.nombre, usuarioMandar.roomid, msg);
                 io.to(usuarioMandar.room).emit('mensaje', mensaje);
             }
         })
@@ -125,7 +136,7 @@ app.get('/home', (req, res) => {
         conexion.query('SELECT * FROM rooms ', async (error, result, field) => {
             res.render('rooms', {
                 name: req.session.name,
-                userid:req.session.userid,
+                userid: req.session.userid,
                 rooms: result,
                 situation: situation
             });
@@ -234,8 +245,8 @@ app.post('/auth', async (req, res) => {
             }
             else {
                 req.session.logeado = true;
-                req.session.name=result[0].name;
-                req.session.userid=result[0].id;
+                req.session.name = result[0].name;
+                req.session.userid = result[0].id;
                 res.render('login', {
                     alert: true,
                     alertTitle: "Confirmacion",
