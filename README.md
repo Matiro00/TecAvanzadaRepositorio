@@ -1,4 +1,4 @@
-(Se requiere descargar xampp para levantar la bd)
+(Se requiere descargar xampp para simular una bd)
 
 
 Pasos para el deploy:
