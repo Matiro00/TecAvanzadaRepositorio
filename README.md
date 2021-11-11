@@ -11,9 +11,9 @@ DB_PASSWORD =
 DB_DATABASE = tp_tec_avanzada
 SESSION_SECRET = secreto123
 
+3- npm run dev
 
-
-3- http://localhost:3000/
+4- http://localhost:3000/
 
 
 enjoy!

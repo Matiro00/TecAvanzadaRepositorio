@@ -1,7 +1,7 @@
 const usuarios= []
 
-function unirseUsuario(id,nombre,room){
-    const usuario ={id,nombre,room}
+function unirseUsuario(id,nombre,userid,room,roomid){
+    const usuario ={id,nombre,userid,room,roomid}
     usuarios.push(usuario)
     return usuario;
 }

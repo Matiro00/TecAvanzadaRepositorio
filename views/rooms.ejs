@@ -59,6 +59,9 @@
                         <div class="row room-card">
                             <div class="col-10">
                                 <div class="room-name">
+                                    <input type="hidden" name="userid" value="<%=userid%>" />
+                                    <input type="hidden" name="nombre" value="<%=name%>" />
+                                    <input type="hidden" name="roomid" value="<%=rooms[i].id%>" />
                                     <input type="hidden" name="room" value="<%= rooms[i].name%>" />
                                     <p name="room" value='<%= rooms[i].name%>'>
                                         <%= rooms[i].name%>

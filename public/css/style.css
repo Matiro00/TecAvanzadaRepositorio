@@ -1,35 +1,33 @@
 *{
     box-sizing: border-box
 }
-html,body{
+body{
     background-color:#808080;
-    height: 100%;
 }
-.background{
-    background-image: url('../images/wave.svg') ;
-    background-repeat: no-repeat;
-    background-size: cover;
-    height: 100%;
-}
+
 #chat{
     padding-top: 10px;
     height: 600px;
     overflow-y: auto;
 }
+
 .user-on-list{
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 20px;
+    font-size: 2vw;
     margin-top: 15px;
     margin-bottom: 15px;
     text-align: center;
     
     
 }
-.list-container{
+.list-user-container{
+    width: 300px;
     height: 580px;
+    overflow-x: hidden;
+    word-wrap: break-word;
     overflow-y: auto;
     direction: rtl;
-    
+    list-style-type: none;
 
     border-width: 3px;
     
@@ -87,7 +85,8 @@ html,body{
     background-color: #737272;
     border: 1px solid #000;
   }
-  
+
+
 
 .bold{
     font-weight: bold;
@@ -114,16 +113,54 @@ html,body{
 .container-form{
     margin-top: 20px;
 }
+.waves{
+    width: 100%;
+}
+.parallax > use {
+    animation: move-forever 25s cubic-bezier(.55,.5,.45,.5)     infinite;
+  }
+  .parallax > use:nth-child(1) {
+    animation-delay: -2s;
+    animation-duration: 7s;
+  }
+  .parallax > use:nth-child(2) {
+    animation-delay: -3s;
+    animation-duration: 10s;
+  }
+  .parallax > use:nth-child(3) {
+    animation-delay: -4s;
+    animation-duration: 13s;
+  }
+  .parallax > use:nth-child(4) {
+    animation-delay: -5s;
+    animation-duration: 20s;
+  }
+  @keyframes move-forever {
+    0% {
+     transform: translate3d(-90px,0,0);
+    }
+    100% { 
+      transform: translate3d(85px,0,0);
+    }
+  }
+.waves-container{
+    position: relative;
+    height: 890px;
+    display: flex;
+    align-items: flex-end;
+}
 .container-salas{
+    position: absolute;
     color: white;
+    left: 15%;
     background-color: rgb(49, 49, 49);
     border-right: 7px solid #000;
     border-bottom: 7px solid #000;
     border-radius: 10px;
-    padding-bottom: 10px;
     margin-top: 10px;
     overflow-y: auto;
     height: 880px;
+    z-index: 1;
 }
 
 .center{
@@ -145,6 +182,7 @@ html,body{
     border-bottom: 2px solid;
     
 }
+
 .swal2-html-container{
     color: red !important;
     text-align: center;
@@ -153,6 +191,11 @@ html,body{
     width: 900px;
 }
 .container-chat{
+    width: 100vw;
+    z-index: 1;
+    position: absolute;
+    bottom: 5%;;
+    left: 15%;
     color: white;
     background-color: rgb(49, 49, 49);
     border-radius: 10px;
@@ -179,6 +222,10 @@ html,body{
     color: white !important;
     font-style: italic !important;
 }
+
+.user-list{
+    font-size: 3vw;
+}
 .swal2-title{
     color: white !important;
     font-size: 42px !important;
@@ -196,10 +243,7 @@ html,body{
     margin-top: 20px;
     margin-bottom: 20px;
 }
-.usuario{
-    padding-left: 40px;
 
-}
 .boton-enviar{
     width: -webkit-fill-available;
     background-color: rgb(2, 90, 2);
@@ -275,7 +319,9 @@ html,body{
     padding-top: 10px;
 }
 .usuario{
+    
     color:white;
+    padding-left: 40px;
 }
 .navbar-custom{
     border-bottom:5px solid rgb(20, 20, 20);

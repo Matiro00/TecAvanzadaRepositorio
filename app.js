@@ -5,8 +5,9 @@ const dotenv = require('dotenv');
 dotenv.config({ path: './env/.env' });
 const conexion = require('./db/db');
 const socketio = require('socket.io');
-const { formatearMensaje, formatearMensajeParaGuardar, formatearMensajeViejosParaMostrar } = require('./public/clases/mensajes.js')
-const { unirseUsuario, getUsuariosPorId, usuarioAbandona, getRoomUsuarios } = require('./public/clases/usuarios')
+const { formatearMensaje, formatearMensajeParaGuardar, formatearMensajeViejosParaMostrar } = require('./public/clases/mensajes.js');
+const { unirseUsuario, getUsuariosPorId, usuarioAbandona, getRoomUsuarios } = require('./public/clases/usuarios');
+
 const app = express();
 var body = require('body-parser')
 
@@ -14,13 +15,7 @@ const http = require('http');
 const server = http.createServer(app);
 const io = socketio(server);
 
-
 const PORT = 3000
-let user = ''
-let user_id;
-let room = ''
-let room_id;
-let mensaje_cache = []
 let situation = 0
 
 app.use(express.urlencoded({ extended: false }));
@@ -42,11 +37,8 @@ server.listen(PORT, () => {
 
 io.on('connection', socket => {
 
-    socket.on('unirseSala', () => {
-
-        
-
-        const usuario = unirseUsuario(socket.id, user, room);
+    socket.on('unirseSala', ({nombre,userid,room,roomid}) => {
+        const usuario = unirseUsuario(socket.id, nombre,userid, room,roomid);
         socket.join(usuario.room)
         socket.emit('alerta', formatearMensaje('Server:', `Bienvenido ${usuario.nombre}`))
         socket.broadcast.to(usuario.room).emit('alerta', formatearMensaje('Server:', `Chicos entro ${usuario.nombre}, dejen de hablar mal de el`));
@@ -55,18 +47,13 @@ io.on('connection', socket => {
         socket.on('disconnect', () => {
             const usuario = usuarioAbandona(socket.id)
             if (usuario) {
-                let room = ''
-                let room_id;
-                mensaje_cache = []
                 io.to(usuario.room).emit('alerta', formatearMensaje('Server:', `${usuario.nombre} por suerte ya se fue.`))
                 io.to(usuario.room).emit('usuariosEnRoom', getRoomUsuarios(usuario.room))
             }
         })
-        socket.on('disconnectSaving', () => {
+        socket.on('disconnectSaving', (mensaje_cache) => {
             const usuario = usuarioAbandona(socket.id)
             if (usuario) {
-                let room = ''
-                let room_id;
                 if (mensaje_cache.length != 0) {
                     let queryString = "INSERT INTO mensajes ( id_user,emisor, id_room, contenido, tiempo) VALUES";
                     let primerquery = true;
@@ -85,7 +72,6 @@ io.on('connection', socket => {
                             console.log(error)
                         }
                         else {
-                            mensaje_cache = []
                             io.to(usuario.room).emit('alerta', formatearMensaje('Server:', `${usuario.nombre} por suerte ya se fue.`))
                             io.to(usuario.room).emit('usuariosEnRoom', getRoomUsuarios(usuario.room))
                         }
@@ -101,12 +87,12 @@ io.on('connection', socket => {
 
         socket.on('mensaje', (msg) => {
             if (msg != '') {
-                mensaje_cache.push(formatearMensajeParaGuardar(user_id, usuario.nombre, room_id, msg));
-                io.to(usuario.room).emit('mensaje', formatearMensaje(usuario.nombre, msg));
+                const usuarioMandar= getUsuariosPorId(socket.id)
+                mensaje=formatearMensajeParaGuardar(usuarioMandar.userid, usuarioMandar.nombre, usuarioMandar.roomid, msg);
+                io.to(usuarioMandar.room).emit('mensaje', mensaje);
             }
         })
     })
-
 
 
 })
@@ -138,7 +124,8 @@ app.get('/home', (req, res) => {
     if (req.session.logeado) {
         conexion.query('SELECT * FROM rooms ', async (error, result, field) => {
             res.render('rooms', {
-                name: user,
+                name: req.session.name,
+                userid:req.session.userid,
                 rooms: result,
                 situation: situation
             });
@@ -150,18 +137,18 @@ app.get('/home', (req, res) => {
     }
 })
 app.get('/joinroom/', (req, res) => {
-    room = req.query.room;
+    const room = req.query.room;
     if (req.session.logeado) {
         conexion.query('SELECT * FROM rooms WHERE name = ?', room, async (error, result, field) => {
-            room_id = result[0].id;
-            conexion.query('SELECT emisor,contenido,tiempo FROM mensajes WHERE id_room = ? ORDER BY tiempo', [room_id], async (error, result, field) => {
+            req.session.roomid = result[0].id;
+            conexion.query('SELECT emisor,contenido,tiempo FROM mensajes WHERE id_room = ? ORDER BY tiempo', [req.session.roomid], async (error, result, field) => {
                 if (error) {
                     console.log(error)
                 }
                 else {
                     if (result.length == 0) {
                         res.render('chat-room', {
-                            name: user,
+                            name: req.session.name,
                             room: room
                         });
                     }
@@ -171,7 +158,7 @@ app.get('/joinroom/', (req, res) => {
                             mensajes.push(formatearMensajeViejosParaMostrar(result[i].emisor, result[i].contenido, result[i].tiempo))
                         }
                         res.render('chat-room', {
-                            name: user,
+                            name: req.session.name,
                             room: room,
                             message: mensajes
                         });
@@ -196,6 +183,36 @@ app.get('/logout', (req, res) => {
     })
 })
 
+app.post('/newRoom', async (req, res) => {
+    let nombreSala = req.body.roomName;
+    if (nombreSala) {
+        conexion.query('SELECT name FROM rooms WHERE name = ?', [nombreSala], async (error, result, field) => {
+            if (result.length == 0) {
+
+
+                conexion.query('INSERT INTO rooms SET ?', { name: nombreSala }, async (error, result) => {
+                    if (error) {
+                        console.log(error);
+                    }
+                    else {
+                        res.redirect('/home');
+                        situation = 3
+                    }
+                }
+                )
+            }
+            else {
+                res.redirect('/home')
+                situation = 2
+            }
+        })
+    }
+
+    else {
+        res.redirect('/home')
+        situation = 1
+    }
+})
 
 app.post('/auth', async (req, res) => {
     let name = req.body.user;
@@ -217,12 +234,12 @@ app.post('/auth', async (req, res) => {
             }
             else {
                 req.session.logeado = true;
-                user = result[0].name;
-                user_id = result[0].id;
+                req.session.name=result[0].name;
+                req.session.userid=result[0].id;
                 res.render('login', {
                     alert: true,
                     alertTitle: "Confirmacion",
-                    alertMessage: "Bienvenido " + user,
+                    alertMessage: "Bienvenido " + req.session.name,
                     alertIcon: 'success',
                     showConfirmButton: false,
                     timer: 2000,
@@ -245,6 +262,8 @@ app.post('/auth', async (req, res) => {
         });
     }
 })
+
+
 app.post('/register', async (req, res) => {
     let name = req.body.user;
     let contrasena = req.body.password;
@@ -297,36 +316,5 @@ app.post('/register', async (req, res) => {
             timer: false,
             ruta: 'register'
         });
-    }
-})
-
-app.post('/newRoom', async (req, res) => {
-    let nombreSala = req.body.roomName;
-    if (nombreSala) {
-        conexion.query('SELECT name FROM rooms WHERE name = ?', [nombreSala], async (error, result, field) => {
-            if (result.length == 0) {
-
-
-                conexion.query('INSERT INTO rooms SET ?', { name: nombreSala }, async (error, result) => {
-                    if (error) {
-                        console.log(error);
-                    }
-                    else {
-                        res.redirect('/home');
-                        situation = 3
-                    }
-                }
-                )
-            }
-            else {
-                res.redirect('/home')
-                situation = 2
-            }
-        })
-    }
-
-    else {
-        res.redirect('/home')
-        situation = 1
     }
 })
