@@ -1,3 +1,6 @@
+(Se requiere descargar xampp para levantar la bd)
+
+
 Pasos para el deploy:
 
 
