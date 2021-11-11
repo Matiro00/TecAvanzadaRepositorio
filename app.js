@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 dotenv.config({ path: './env/.env' });
 const conexion = require('./db/db');
 const socketio = require('socket.io');
-const { formatearMensaje, formatearMensajeParaGuardar } = require('./public/clases/mensajes.js')
+const { formatearMensaje, formatearMensajeParaGuardar, formatearMensajeViejosParaMostrar } = require('./public/clases/mensajes.js')
 const { unirseUsuario, getUsuariosPorId, usuarioAbandona, getRoomUsuarios } = require('./public/clases/usuarios')
 const app = express();
 var body = require('body-parser')
@@ -44,7 +44,7 @@ io.on('connection', socket => {
 
     socket.on('unirseSala', () => {
 
-
+        
 
         const usuario = unirseUsuario(socket.id, user, room);
         socket.join(usuario.room)
@@ -55,6 +55,8 @@ io.on('connection', socket => {
         socket.on('disconnect', () => {
             const usuario = usuarioAbandona(socket.id)
             if (usuario) {
+                let room = ''
+                let room_id;
                 mensaje_cache = []
                 io.to(usuario.room).emit('alerta', formatearMensaje('Server:', `${usuario.nombre} por suerte ya se fue.`))
                 io.to(usuario.room).emit('usuariosEnRoom', getRoomUsuarios(usuario.room))
@@ -63,36 +65,43 @@ io.on('connection', socket => {
         socket.on('disconnectSaving', () => {
             const usuario = usuarioAbandona(socket.id)
             if (usuario) {
-                let queryString = "INSERT INTO mensajes ( id_user,emisor, id_room, contenido, tiempo) VALUES";
-                let primerquery = true;
-                mensaje_cache.forEach(element => {
-                    if (primerquery) {
-                        queryString += "('" + element.user_id + "','"+ element.nombre + "','" + element.room_id + "','" + element.texto + "','" + element.tiempo + "')"
-                        primerquery = false;
-                    }
-                    else {
-                        queryString += ",('" + element.user_id + "','"+ element.nombre + "','" + element.room_id + "','" + element.texto + "','" + element.tiempo + "')"
-                    }
+                let room = ''
+                let room_id;
+                if (mensaje_cache.length != 0) {
+                    let queryString = "INSERT INTO mensajes ( id_user,emisor, id_room, contenido, tiempo) VALUES";
+                    let primerquery = true;
+                    mensaje_cache.forEach(element => {
+                        if (primerquery) {
+                            queryString += "('" + element.user_id + "','" + element.nombre + "','" + element.room_id + "','" + element.texto + "','" + element.tiempo + "')"
+                            primerquery = false;
+                        }
+                        else {
+                            queryString += ",('" + element.user_id + "','" + element.nombre + "','" + element.room_id + "','" + element.texto + "','" + element.tiempo + "')"
+                        }
 
-                });
-                console.log(queryString);
-                conexion.query(queryString, async (error, result) => {
-                    if (error) {
-                        console.log(error)
-                    }
-                    else {
-                        mensaje_cache = []
-                        io.to(usuario.room).emit('alerta', formatearMensaje('Server:', `${usuario.nombre} por suerte ya se fue.`))
-                        io.to(usuario.room).emit('usuariosEnRoom', getRoomUsuarios(usuario.room))
-                    }
-                })
+                    });
+                    conexion.query(queryString, async (error, result) => {
+                        if (error) {
+                            console.log(error)
+                        }
+                        else {
+                            mensaje_cache = []
+                            io.to(usuario.room).emit('alerta', formatearMensaje('Server:', `${usuario.nombre} por suerte ya se fue.`))
+                            io.to(usuario.room).emit('usuariosEnRoom', getRoomUsuarios(usuario.room))
+                        }
+                    })
+                }
+                else {
+                    io.to(usuario.room).emit('alerta', formatearMensaje('Server:', `${usuario.nombre} por suerte ya se fue.`))
+                    io.to(usuario.room).emit('usuariosEnRoom', getRoomUsuarios(usuario.room))
+                }
 
             }
         })
 
         socket.on('mensaje', (msg) => {
             if (msg != '') {
-                mensaje_cache.push(formatearMensajeParaGuardar(user_id,usuario.nombre ,room_id, msg));
+                mensaje_cache.push(formatearMensajeParaGuardar(user_id, usuario.nombre, room_id, msg));
                 io.to(usuario.room).emit('mensaje', formatearMensaje(usuario.nombre, msg));
             }
         })
@@ -145,22 +154,31 @@ app.get('/joinroom/', (req, res) => {
     if (req.session.logeado) {
         conexion.query('SELECT * FROM rooms WHERE name = ?', room, async (error, result, field) => {
             room_id = result[0].id;
-            conexion.query('SELECT emisor,contenido,tiempo FROM mensajes ORDER BY tiempo', async (error, result, field)=>{
-                if(result.length==0){
-                    res.render('chat-room', {
-                        name: user,
-                        room: room
-                    });
+            conexion.query('SELECT emisor,contenido,tiempo FROM mensajes WHERE id_room = ? ORDER BY tiempo', [room_id], async (error, result, field) => {
+                if (error) {
+                    console.log(error)
                 }
-                else{
-                    res.render('chat-room', {
-                        name: user,
-                        room: room,
-                        message:result
-                    });
+                else {
+                    if (result.length == 0) {
+                        res.render('chat-room', {
+                            name: user,
+                            room: room
+                        });
+                    }
+                    else {
+                        let mensajes = []
+                        for (let i = 0; i < result.length; i++) {
+                            mensajes.push(formatearMensajeViejosParaMostrar(result[i].emisor, result[i].contenido, result[i].tiempo))
+                        }
+                        res.render('chat-room', {
+                            name: user,
+                            room: room,
+                            message: mensajes
+                        });
+                    }
                 }
             })
-            
+
         })
 
     }
