@@ -1,6 +1,3 @@
-(Se requiere descargar xampp para simular una bd)
-
-
 Pasos para el deploy:
 
 
@@ -14,9 +11,9 @@ DB_PASSWORD =
 DB_DATABASE = tp_tec_avanzada
 SESSION_SECRET = secreto123
 
-3- npm run dev
 
-4- http://localhost:3000/
+
+3- http://localhost:3000/
 
 
 enjoy!
