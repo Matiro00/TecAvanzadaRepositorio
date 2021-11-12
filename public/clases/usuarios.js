@@ -16,7 +16,7 @@ function usuarioAbandona(id){
 }
 
 function getRoomUsuarios(room){
-    return usuarios.filter(user => user.room=room)
+    return usuarios.filter(user => user.room===room)
 }
 
 module.exports={
